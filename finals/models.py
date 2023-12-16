@@ -47,8 +47,9 @@ class GruposProveedor(models.Model):
     activo = models.BooleanField()
     responsable_grupo = models.CharField(max_length=25)
 
+   
     def __str__(self):
-        return f'{self.codigo_grupo}'
+        return f'{self.codigo_grupo} - {self.grupo_descripcion} '
 
     def estado_activo(self):
         if self.activo:
@@ -63,17 +64,21 @@ class LineasArticulos(models.Model):
     grupo = models.ForeignKey(GruposProveedor, on_delete=models.CASCADE)
     activo = models.BooleanField()
     responsable_linea = models.CharField(max_length=25)
-    def __str__(self):
-        return self.codigo_linea
 
+    def __str__(self):
+        return f"{self.codigo_linea}  - {self.linea_descripcion} "
+
+    
 class SublineasArticulos(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     codigo_sublinea = models.CharField(max_length=15)
     sublinea_descripcion = models.CharField(max_length=100)
     linea = models.ForeignKey(LineasArticulos, on_delete=models.CASCADE)
     estado = models.BooleanField()
+
     def __str__(self):
-        return self.codigo_sublinea
+        return f"{self.codigo_sublinea}  - {self.sublinea_descripcion} "
+    
 
 class UnidadesMedida(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -112,7 +117,7 @@ class Clientes(models.Model):
     direccion = models.CharField(max_length=150)
     canal_cliente = models.ForeignKey(CanalCliente,on_delete=models.CASCADE)
     def __str__(self):
-        return self.nro_documento
+        return f"{self.nro_documento}  - {self.nombre_razon_social} "
 
 class CondicionVentas(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

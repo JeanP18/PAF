@@ -129,7 +129,8 @@ class ItemsNotaVentaAPIView(APIView):
 
 #aplica la condicion
         if promocion:
-            if promocion.cantidad_minima_compra >= cantidad_comprada:
+            if promocion.cantidad_minima_compra <= cantidad_comprada:
+                # 7 >= 2
                 cantidad_bonificada = promocion.unidades_bonificadas
                 mensaje= f"Tu venta ha sido bonificada con {cantidad_bonificada} {promocion.articulo_bonificacion.descripcion}"
                 ItemsNotaVenta.objects.create(
@@ -154,7 +155,7 @@ class ItemsNotaVentaAPIView(APIView):
         ).first()
 
         if promocion :
-            if promocion.monto_minimo >= (cantidad_comprada * articulo.precio_unitario):
+            if promocion.monto_minimo <= (cantidad_comprada * articulo.precio_unitario):
                 porcentaje_descuento = promocion.porcentaje_descuento
                 descuento_monto = cantidad_comprada * articulo.precio_unitario * (porcentaje_descuento / 100)
                 mensaje = f"Por la compra de S/{cantidad_comprada * articulo.precio_unitario:.2f} en productos del proveedor {articulo.grupo}, se otorga un descuento del {porcentaje_descuento}%."
@@ -199,13 +200,15 @@ class ItemsNotaVentaAPIView(APIView):
             return
         promocion_asociada = Promocion_articulos_asociados.objects.filter(
             promocion__tipo_promocion='caso_4',
+            
             articulo=articulo,
             promocion__activo=True
         ).order_by('-cantidad_articulo').first()
-        
+        print(promocion_asociada,'promocion_asociada')
         if promocion_asociada :
             min = promocion_asociada.promocion.cantidad_minima_compra
-            max = promocion_asociada.promocion.cantidad_minima_compra
+            max = promocion_asociada.promocion.cantidad_maxima_compra
+            
             if (min <= cantidad_comprada <= max):
                 porcentaje_descuento = promocion_asociada.promocion.porcentaje_descuento
                 descuento_monto = cantidad_comprada * articulo.precio_unitario * (porcentaje_descuento / 100)
@@ -226,7 +229,7 @@ class ItemsNotaVentaAPIView(APIView):
 
         promocion = Promocion.objects.filter(
             tipo_promocion='caso_5',
-            tipo_cliente=self.nota_venta.cliente.canal_cliente,
+            # tipo_cliente=self.nota_venta.cliente.canal_cliente,
             articulo_aplicable=articulo,
             activo=True
         ).first()
